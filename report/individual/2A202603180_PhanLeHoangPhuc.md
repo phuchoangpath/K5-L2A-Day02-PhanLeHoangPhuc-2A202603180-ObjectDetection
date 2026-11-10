@@ -55,9 +55,13 @@ Dẫn tới `outputs/annotation_evaluation.json` trong repo. Nếu rework, ghi �
 Trả lời bốn câu hỏi cuối notebook:
 
 1. Lớp nào recall thấp nhất? Ảnh nào minh họa?
+-> Lớp recal thấp nhất là bus (value = 0), drive_058
 2. Nếu mAP50 cao nhưng mAP50–95 thấp, cần kiểm điều gì trên box?
+->  Khi mAP50 cao nhưng mAP50-95 thấp, nguyên nhân cốt lõi là bounding box dự đoán chưa ôm khít vật thể hoặc ranh giới biên bị lệch dù phân loại đúng. Cần kiểm tra lại độ vừa vặn của box, tính nhất quán khi gán nhãn ở các vật thể bị che khuất hoặc cắt ngang và theo dõi xem đồ thị box_loss trong quá trình huấn luyện đã thực sự hội tụ hay chưa.
 3. Lỗi class nào có thể liên quan guideline? Dữ kiện nào hỗ trợ nhận xét?
+-> Lỗi class liên quan đến guideline thường là sự nhầm lẫn giữa các lớp có hình thái gần giống nhau như car với van hoặc truck với bus. Dữ kiện hỗ trợ nhận xét rõ nhất là ma trận nhầm lẫn với tỷ lệ đoán chéo cao ở các ô ngoài đường chéo chính, chỉ số F1 và PR của class đó tụt sâu bất thường, cùng các hình ảnh trực quan hóa dự đoán cho thấy mô hình đoán lệch hẳn so với nhãn gốc do cách định nghĩa không nhất quán. 
 4. Vì sao không dùng 10 ảnh eval để train? Vai trò validation của chúng trong notebook là gì?
+-> Không dùng 10 ảnh eval để train nhằm tránh hiện tượng rò rỉ dữ liệu khiến mô hình bị học vẹt và đưa ra điểm số cao ảo mà không tổng quát hóa được trên môi trường thực tế.
 
 ## 6. Khó khăn và cách xử lý
 
@@ -71,11 +75,11 @@ Trả lời bốn câu hỏi cuối notebook:
 | Tiêu chí | Kết quả bài làm | Điểm |
 | --- | --- | ---: |
 | Hoàn thành và định dạng YOLO | 50 file cùng basename, 5 cột, normalized, bốn class ID đúng | 10 |
-| Đầy đủ vật thể | gán đủ xe thuộc schema, kể cả xe che/cắt khung có thể nhận diện | 20 |
-| Độ bám sát và hình học box | box sát phần vật thể nhìn thấy, không lấn nền/gộp vật thể | 20 |
-| Phân lớp nhất quán | phân biệt `car/truck/bus/van`, không gán vật thể ngoài scope | 15 |
+| Đầy đủ vật thể | gán đủ xe thuộc schema, còn sót xe che/cắt khung có thể nhận diện | 15 |
+| Độ bám sát và hình học box | còn vài box không sát phần vật thể nhìn thấy |15  |
+| Phân lớp nhất quán | phân biệt car/truck/bus/van, không gán vật thể ngoài scope | 15 |
 | Mini guideline và quyết định mơ hồ | định nghĩa lớp, quy tắc box, ít nhất ba case có lý do | 10 |
-| Gold-set annotation QC | F1 = 0.6519 và mean IoU = 0.8351 | 15 |
+| Gold-set annotation QC | F1 = 0.6519 và mean IoU = 0.8351 | 10 |
 | Pipeline YOLO và phân tích | Colab chạy được, không dùng eval để train, có metrics/ảnh eval và nhận xét lỗi | 10 |
 Đối chiếu [RUBRIC.md](../../RUBRIC.md): phần nào đã có kết quả, phần nào còn thiếu hoặc chưa kiểm được. Không tự nhận hoàn thành bước chưa chạy.
 
